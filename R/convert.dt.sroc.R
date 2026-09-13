@@ -1,7 +1,8 @@
-#' data transformation for tsroc
-#' 
-#' 
-#' 
+###########################
+##
+## Support function
+##
+###########################  
 convert.dt.sroc <- function(
   TP, FN, FP, TN, data,
   cc.value = 0.5,

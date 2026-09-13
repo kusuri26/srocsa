@@ -1,4 +1,4 @@
-#' @title Time Dependent Sensitivity Analysis Old
+#' @title Time Dependent SROC without PB
 #'
 #' @description Time Dependent Sensitivity Analysis Old (not recommended)
 #'
@@ -67,11 +67,11 @@
 #' \code{\link{plot.tdsaold}}.
 #'
 #' 
-meta.tsroc<-function(
+tsroc <- function(
   time.points, 
-  study.os, time.os, n1.os, n0.os, s1.os, s0.os, data.os,
-  study.lnhr, lnhr, var.lnHR, data.lnhr,
-  time.med, n1.med, n0.med, s1.med, s0.med, data.mct,
+  study.os, time.os, n1.os, n0.os, s1.os, s0.os, data.os=NULL,
+  study.lnhr, lnhr, var.lnHR, data.lnhr =NULL,
+  time.med, n1.med, n0.med, s1.med, s0.med, data.mct=NULL,
   ci.level = 0.95,
   parallel.ncores = 1L,
   parset = list()
@@ -148,7 +148,7 @@ meta.tsroc<-function(
 
 
         ## update parameter setting
-  parset <- modifyList(default.parset(), parset)
+  parset <- modifyList(default.parset.tsroc.pb(), parset)
 
 
   f <- function(tt){
@@ -158,7 +158,7 @@ meta.tsroc<-function(
     study.lnhr, lnhr, var.lnHR, data.lnhr,
     time.med, n1.med, n0.med, s1.med, s0.med, data.mct)
 
-  meta.sroc.mle(y1=data.log$u_sen, y2=data.log$u_spe, v1=data.log$v_sen, v2=data.log$v_spe, v12=data.log$v_senspe, parset=parset)
+  meta.sroc.mle(y1=data.log$u_sen, y2=data.log$u_spe, v1=data.log$v_sen, v2=data.log$v_spe, v12=data.log$v_senspe, ci.level = ci.level, parset=parset)
   
   }
 
@@ -195,7 +195,7 @@ meta.tsroc<-function(
 
 # res$call <- this.call
   
-  class(res) <- "sroc.pb"
+  class(res) <- "srocsa"
   names(res) <- time.points
   return(res)
 

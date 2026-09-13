@@ -1,7 +1,10 @@
+###########################
+##
+## Support function
+##
+###########################  
 
-## hide
-
-tsroc.pb.logrank.single <- function(
+tsrocsa.lrt.single <- function(
   y1, y2, y3,
   v1, v2, v3, v12, v13, v23,
   p, 
@@ -121,7 +124,7 @@ tsroc.pb.logrank.single <- function(
           se, sp, hr)
         names(opt.o$par.all) <- c("mu1", "mu2", "mu3", "tau1^2", "tau2^2", "tau3^2", "tau12", "tau23", "tau13", "beta", "alpha", "sauc", "sens", "spec", "hr")
 
-      }
+      } else opt.o <- NULL
     }
 
     return(opt.o)

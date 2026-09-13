@@ -76,7 +76,7 @@
 #'
 #' @export
 
-tsroc.pb.logrank <- function(
+tsrocsa.lrt <- function(
   time.points, 
   study.os, time.os, n1.os, n0.os, s1.os, s0.os, data.os,
   study.lnhr, lnhr, var.lnHR, data.lnhr,
@@ -167,7 +167,7 @@ f <- function(tt, pp){
     study.lnhr, lnhr, var.lnHR, data.lnhr,
     time.med, n1.med, n0.med, s1.med, s0.med, data.mct)
 
-  tsroc.pb.logrank.single(
+  tsrocsa.lrt.single(
     y1=data.log$u_sen, y2=data.log$u_spe, y3=data.log$u_lnHR,
     v1=data.log$v_sen, v2=data.log$v_spe, v3=data.log$v_lnHR,
     v12=data.log$v_senspe, v13 = data.log$v_senlnHR, v23=data.log$v_spelnHR,
@@ -197,7 +197,7 @@ f <- function(tt, pp){
       cl,
       varlist = c(
         "f", "fit_at_time", "convert.dt.tsroc", "cens.eta",
-        "tsroc.pb.logrank.single", "tsroc.pb.init", "clk.TNM.ml",
+        "tsrocsa.lrt.single", "tsroc.pb.init", "clk.TNM.ml",
         "meta.sroc.mle", "llk.p.sroc", "llk.p.tsroc", "sroc.init",
         "sauc", ".DID.sroc", "resolve_inputs",
         "default.parset.tsroc.pb", "default.parset.sroc"
@@ -208,7 +208,7 @@ f <- function(tt, pp){
     res <- parallel::parLapply(cl, X = time.points, fun = fit_at_time)
   }
 
-  class(res) <- "meta.pb"
+  class(res) <- "srocsa"
   names(res) <- as.character(time.points)
   for (i in seq_along(res)) {
     names(res[[i]]) <- as.character(senp.p)

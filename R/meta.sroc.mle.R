@@ -1,4 +1,8 @@
-## hide
+###########################
+##
+## Support function
+##
+###########################  
 
 meta.sroc.mle <- function(
   # data input
@@ -79,9 +83,6 @@ meta.sroc.mle <- function(
   }
 
 
-  
-
-  class(opt) <- "sroc.pb"
   return(opt)
 
 }

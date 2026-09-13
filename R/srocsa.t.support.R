@@ -1,9 +1,14 @@
+###########################
+##
+## Support function
+##
+###########################  
 
-### hide
+
 sroc.pb.t.fix <- function(
   y1, y2, v1, v2, 
   p,
-  c1.sq = 0.5,
+  c11 = 0.5,
   ci.level = 0.95,
   parset = list()
 ){
@@ -12,7 +17,7 @@ sroc.pb.t.fix <- function(
 
     ## fix c11
 
-  c11 <- c1.sq
+
   c22 <- 1-c11
   c1  <- sqrt(c11)
   c2  <- sqrt(c22)
@@ -21,9 +26,11 @@ sroc.pb.t.fix <- function(
   start5 <- sroc.init(y1, y2, v1, v2, v12=NULL)
   start6 <- c(start5, beta=0.1)
 
+  parset <- modifyList(default.parset.sroc(), parset)
+
 
   fn <- function(par) llk.o.srocpb.t(
-    par = c(par[1:6], c1),
+    par = c(par[1:6], c11),
     n=n, y1=y1, y2=y2, v1=v1, v2=v2, 
     p = p,
     alpha.bound = parset$alpha.bound
@@ -88,7 +95,8 @@ sroc.pb.t.fix <- function(
     sauc <- opt$sauc.ci[1]
 
     ## beta ----
-    if(p==1) opt$beta <- NA else opt$beta <- b
+    if(p==1) beta <- NA else beta <- b
+    opt$beta <- beta
 
       # b.se <- suppressWarnings(sqrt(inv.I.fun.m[6,6]))
       # b.lb <- b + qnorm((1-ci.level)/2, lower.tail = TRUE)*b.se
@@ -97,8 +105,8 @@ sroc.pb.t.fix <- function(
 
     ## alpha -----
     if(p==1) a.opt <- NA else {
-      .a.p <- function(a) { sum(1/ pnorm( (a + b * u.ldor/se.ldor) / sq ), na.rm = TRUE) - n/p }
-      a.opt.try <- suppressWarnings(try(uniroot(.a.p, interval = c(-parset$alpha.bound, parset$alpha.bound), extendInt =  "yes"), silent = TRUE))
+      a.p <- function(a) { sum(1/ pnorm( (a + b * u.ldor/se.ldor) / sq ), na.rm = TRUE) - n/p }
+      a.opt.try <- suppressWarnings(try(uniroot(a.p, interval = c(-parset$alpha.bound, parset$alpha.bound), extendInt =  "yes"), silent = TRUE))
       a.opt <- a.opt.try$root
     }
     opt$alpha <- c(alpha = a.opt)
@@ -120,7 +128,7 @@ sroc.pb.t.fix <- function(
     names(opt$mu2.ci) <- c("mu2", "mu2.lb", "mu2.ub", "sp", "sp.lb", "sp.ub")
 
     ## PAR AND ALL PAR -----
-    opt$par.all <- c(u1, u2, t11, t22, t12, c1^2, c2^2,  b, a.opt, sauc, se, sp)
+    opt$par.all <- c(u1, u2, t11, t22, t12, c11, c22,  beta, a.opt, sauc, se, sp)
     names(opt$par.all) <- c("mu1", "mu2", "tau1^2", "tau2^2", "tau12", "c1^2", "c2^2", "beta", "alpha", "sauc", "sens", "spec")
 
     ## LOGIT-DATA  -----
@@ -128,7 +136,7 @@ sroc.pb.t.fix <- function(
     # opt$call <- this.call
 
     
-}
+} else opt <- NULL
 
   return(opt)
 
@@ -151,7 +159,9 @@ sroc.pb.t.unfix <- function(
 
     ## unfix c11
     start5 <- sroc.init(y1, y2, v1, v2, v12=NULL)
-    start7 <- c(start5, beta=0.1, c1=0.1)
+    start7 <- c(start5, beta=0.1, c11=0.1)
+
+    parset <- modifyList(default.parset.sroc(), parset)
 
     fn <- function(par) llk.o.srocpb.t(
       par,
@@ -183,8 +193,8 @@ sroc.pb.t.unfix <- function(
 
     b   <- opt$par[6]
 
-    c1  <- opt$par[7]
-    c11 <- c1^2
+    c11 <- opt$par[7]
+    c1  <- sqrt(c11)
     c22 <- 1-c11
     c2  <- sqrt(c22)
 
@@ -199,7 +209,7 @@ sroc.pb.t.unfix <- function(
 
     ##  hessian ----
     hes <- numDeriv::hessian(fn, opt$par)
-    rownames(hes) <- colnames(hes) <- c("mu1", "mu2", "tau1", "tau2", "rho", "beta", "c1")
+    rownames(hes) <- colnames(hes) <- c("mu1", "mu2", "tau1", "tau2", "rho", "beta", "c11")
 
     ## sauc and CI ----
     if(p==1) inv.I.fun.m <- solve(hes[1:5,1:5]) else inv.I.fun.m <- solve(hes)
@@ -212,7 +222,8 @@ sroc.pb.t.unfix <- function(
     sauc <- opt$sauc.ci[1]
 
     # beta -----
-    if(p==1) opt$beta <- NA else opt$beta <- b
+    if(p==1) beta <- NA else beta <- b
+    opt$beta <- beta
 
       # b.se <- suppressWarnings(sqrt(solve(hes)[6,6]))
       # b.lb <- b + qnorm((1-ci.level)/2, lower.tail = TRUE)*b.se
@@ -223,8 +234,8 @@ sroc.pb.t.unfix <- function(
 
     ## alpha -----
     if(p==1) a.opt <- NA else {
-      .a.p <- function(a) { sum(1/ pnorm( (a + b * u.ldor/se.ldor) / sq ), na.rm = TRUE) - n/p }
-      a.opt.try <- suppressWarnings(try(uniroot(.a.p, interval = c(-parset$alpha.bound, parset$alpha.bound), extendInt = "yes"), silent = TRUE))
+      a.p <- function(a) { sum(1/ pnorm( (a + b * u.ldor/se.ldor) / sq ), na.rm = TRUE) - n/p }
+      a.opt.try <- suppressWarnings(try(uniroot(a.p, interval = c(-parset$alpha.bound, parset$alpha.bound), extendInt = "yes"), silent = TRUE))
       a.opt <- a.opt.try$root
     }
 
@@ -247,9 +258,10 @@ sroc.pb.t.unfix <- function(
     names(opt$mu2.ci) <- c("mu2", "mu2.lb", "mu2.ub", "spec", "sp.lb", "sp.ub")
 
     ## PAR AND ALL PAR -----
-    opt$par.all <- c(u1, u2, t11, t22, t12, c1^2, c2^2,  b, a.opt, sauc, se, sp)
+    opt$par.all <- c(u1, u2, t11, t22, t12, c11, c22, beta, a.opt, sauc, se, sp)
     names(opt$par.all) <- c("mu1", "mu2", "tau1^2", "tau2^2", "tau12", "c1^2", "c2^2", "beta", "alpha", "sauc", "sens", "spec")
-  }
+  
+  } else opt <- NULL
 
   
   return(opt)
@@ -277,13 +289,13 @@ llk.o.srocpb.t <- function(
   t2 <- par[4]
   r  <- par[5]
   b  <- par[6]
-  c1 <- par[7]  ## CAN BE EITHER PAR OR GIVEN VALUE
+  c11 <- par[7]  ## CAN BE EITHER PAR OR GIVEN VALUE
 
   t11 <- t1^2
   t22 <- t2^2
   t12 <- t1*t2*r
 
-  c11 <- c1^2
+  c1 <- sqrt(c11)
   c22 <- 1-c11
   c2  <- sqrt(c22)
 

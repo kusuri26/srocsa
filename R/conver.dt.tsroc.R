@@ -1,7 +1,8 @@
-#' data transformation for tsroc
-#' 
-#' 
-#' 
+###########################
+##
+## Support function
+##
+###########################  
 convert.dt.tsroc <- function(
 		time.point, study.os, time.os, n1.os, n0.os, s1.os, s0.os, data.os,
 		study.lnhr, lnhr, var.lnHR, data.lnhr,

@@ -69,7 +69,7 @@
 #'
 #' @export
 
-sroc <- function(
+plot.sroc <- function(
   # object,
   # sroc.type = c("sroc", "hsroc"),
   # mu1, mu2, tau1, tau2, rho,
