@@ -197,6 +197,11 @@ tsroc <- function(
   
   class(res) <- "srocsa"
   names(res) <- time.points
+
+  ## information for print/summary/plot methods
+  attr(res, "type")    <- "tsroc"
+  attr(res, "n.study") <- vapply(time.points, function(tt) sum(data.os$time.os == tt, na.rm = TRUE), numeric(1))
+
   return(res)
 
 # setClass(
