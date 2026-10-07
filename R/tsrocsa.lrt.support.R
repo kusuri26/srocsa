@@ -124,6 +124,10 @@ tsrocsa.lrt.single <- function(
           se, sp, hr)
         names(opt.o$par.all) <- c("mu1", "mu2", "mu3", "tau1^2", "tau2^2", "tau3^2", "tau12", "tau23", "tau13", "beta", "alpha", "sauc", "sens", "spec", "hr")
 
+        ## for print/summary/plot methods (appended at the end of the list)
+        opt.o$sauc.ci <- sauc.ci
+        opt.o$var.ml  <- var.ml
+
       } else opt.o <- NULL
     }
 

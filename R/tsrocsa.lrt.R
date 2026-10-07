@@ -213,6 +213,11 @@ f <- function(tt, pp){
   for (i in seq_along(res)) {
     names(res[[i]]) <- as.character(senp.p)
   }
+
+  ## information for print/summary/plot methods
+  attr(res, "type")    <- "tsrocsa.lrt"
+  attr(res, "n.study") <- vapply(time.points, function(tt) sum(data.os$time.os == tt, na.rm = TRUE), numeric(1))
+
   return(res)
 
 

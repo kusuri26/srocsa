@@ -51,22 +51,24 @@
 #'
 #' @examples
 #'
-#' sa.fit1.fc <- srocpb.p.fc(data=IVD, TP = TP, FN = FN, TN = TN, FP = FP, p = 0.7)
+#' sa.fit1.fc <- srocpb.p.fc(data = IVD, TP = TP, FN = FN, TN = TN, FP = FP, p = 0.7)
 #' sa.fit1.fc
 #'
-#' sa.fit2.fc <- srocpb.p.fc(ldata=IVD_2, y1 = y1, y2 = y2, v1 = v1, v2 = v2, p = 0.7)
+#' sa.fit2.fc <- srocpb.p.fc(ldata = IVD_2, y1 = y1, y2 = y2, v1 = v1, v2 = v2, p = 0.7)
 #' sa.fit2.fc
 #'
 #' ## Specifying data and variables are required.
 #' ## The followings are wrong and cause error
 #' \dontrun{
-#' sa.fit1.fc.wrong <- srocpb.p.fc(data=IVD, TP, FN, TN, FP, p = 0.7)
+#' sa.fit1.fc.wrong <- srocpb.p.fc(data = IVD, TP, FN, TN, FP, p = 0.7)
 #'
-#' sa.fit2.fc.wrong <- srocpb.p.fc(ldata=IVD_2, y1, y2, v1, v2, p = 0.7)
+#' sa.fit2.fc.wrong <- srocpb.p.fc(ldata = IVD_2, y1, y2, v1, v2, p = 0.7)
 #' }
 #'
-#' sa.fit2 <- srocpb.p.fc(data=IVD, TP = TP, FN = FN, TN = TN, FP = FP, p = 0.7,
-#'                           correct.type = "all")
+#' sa.fit2 <- srocpb.p.fc(
+#'   data = IVD, TP = TP, FN = FN, TN = TN, FP = FP, p = 0.7,
+#'   correct.type = "all"
+#' )
 #' sa.fit2
 #'
 #' sa.fit3 <- srocpb.p.fc(IVD, TP = TP, FN = FN, TN = TN, FP = FP, p = 0.7)
@@ -76,42 +78,38 @@
 #'
 
 sroc <- function(
-  TP, FN, FP, TN, 
+  TP, FN, FP, TN,
   data = NULL,
   cc.value = 0.5,
-  cc.type  = c("single", "all"),
+  cc.type = c("single", "all"),
   ci.level = 0.95,
   parset = list()
-){
+) {
+  cc.type <- match.arg(cc.type)
+  inputs <- resolve_inputs(
+    exprs = list(
+      TP  = substitute(TP),
+      FN  = substitute(FN),
+      FP  = substitute(FP),
+      TN  = substitute(TN)
+    ),
+    data = data,
+    env = parent.frame(),
+    numeric = FALSE,
+    same.length = TRUE
+  )
 
-    cc.type   <- match.arg(cc.type)
-    inputs <- resolve_inputs(
-      exprs = list(
-        TP  = substitute(TP),
-        FN  = substitute(FN),
-        FP  = substitute(FP),
-        TN  = substitute(TN)
-      ),
-      data = data,
-      env = parent.frame(),
-      numeric = FALSE,
-      same.length = TRUE
-    )
 
-   
-      TP = inputs$TP
-      FN = inputs$FN
-      FP = inputs$FP
-      TN = inputs$TN
-    
+  TP <- inputs$TP
+  FN <- inputs$FN
+  FP <- inputs$FP
+  TN <- inputs$TN
 
-    ## update parameter setting
+
+  ## update parameter setting
   parset <- modifyList(default.parset.sroc(), parset)
 
-  data.conv <- convert.dt.sroc(TP, FN, FP, TN, data=NULL, cc.value=cc.value, cc.type= cc.type)
+  data.conv <- convert.dt.sroc(TP, FN, FP, TN, data = NULL, cc.value = cc.value, cc.type = cc.type)
 
-  meta.sroc.mle(data.conv$y1, data.conv$y2, data.conv$v1, data.conv$v2, parset=parset)
-
+  meta.sroc.mle(data.conv$y1, data.conv$y2, data.conv$v1, data.conv$v2, ci.level = ci.level, parset = parset)
 }
-
-

@@ -209,6 +209,12 @@ f <- function(pp){
   res$call <- this.call
   
   class(res) <- "srocsa"
+
+  ## information for print/summary/plot methods
+  attr(res, "type")    <- "srocsa.t"
+  attr(res, "sa.p")    <- sa.p
+  attr(res, "n.study") <- n
+
   return(res)
 
 }

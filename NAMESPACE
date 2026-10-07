@@ -1,1 +1,5 @@
 exportPattern("^[[:alpha:]]+")
+S3method(print, srocsa)
+S3method(summary, srocsa)
+S3method(print, summary.srocsa)
+S3method(plot, srocsa)
